@@ -1,0 +1,389 @@
+/* childHood 阅读器 v6 — "故纸堆" · Old Paper Stack */
+/* Design: warm, literary, nostalgic — like discovering a cherished old book */
+
+/* ==============================
+   Root variables (default: 纸 · Paper)
+   ============================== */
+:root {
+    /* Sidebar — warm dark, like old wood */
+    --sidebar-bg: #292422;
+    --sidebar-text: #e2dbd4;
+    --sidebar-header-bg: #1f1a18;
+    --sidebar-border: rgba(255,255,255,0.08);
+    --sidebar-hover: rgba(255,255,255,0.05);
+    --sidebar-active: rgba(155,123,109,0.22);
+    --sub-bg: rgba(0,0,0,0.14);
+    --tree-line: rgba(255,255,255,0.08);
+
+    /* Content — warm paper */
+    --content-bg: #faf6f2;
+    --text: #2c2320;
+    --text-secondary: #8a7a70;
+    --accent: #9b7b6d;
+    --accent-light: #b89482;
+
+    /* Blocks */
+    --blockquote-bg: #f6efe8;
+    --blockquote-border: #9b7b6d;
+    --code-bg: #f4ede5;
+    --table-th-bg: #f4ede5;
+    --gradient-start: #7a5d50;
+    --gradient-end: #5c4038;
+    --nav-bg: #f6efe8;
+    --search-bg: rgba(24,18,16,0.65);
+    --search-panel-bg: #faf7f3;
+    --scrollbar-track: transparent;
+    --scrollbar-thumb: rgba(0,0,0,0.07);
+    --scrollbar-hover: rgba(0,0,0,0.13);
+    --border-color: #e8dfd5;
+    --radius-sm: 6px;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.03);
+    --shadow: 0 2px 16px rgba(0,0,0,0.05);
+    --shadow-lg: 0 16px 48px rgba(0,0,0,0.10);
+    --font-sans: "Inter", "SF Pro Text", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    --font-serif: "Source Serif 4", "Noto Serif CJK SC", "Songti SC", "STSong", serif;
+    --content-font-size: 17px;
+    --content-font-family: "Source Serif 4", "Noto Serif CJK SC", "Songti SC", "STSong", serif;
+    --fs-0: 14px; --fs-1: 16px; --fs-2: 18px; --fs-3: 20px; --fs-4: 22px;
+
+    /* Glass morphism */
+    --glass-bg: rgba(250,247,243,0.72);
+    --glass-border: rgba(0,0,0,0.05);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.06);
+    --glass-blur: blur(20px) saturate(160%);
+
+    /* Spring & motion */
+    --spring-ease: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --smooth-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --accent-gradient: linear-gradient(135deg, #9b7b6d, #b89482);
+
+    /* Progress */
+    --progress-height: 3px;
+
+    --sidebar-width: 285px;
+}
+
+/* ==============================
+   Accent flavor for sidebar title
+   ============================== */
+.sidebar-title-row h1 {
+    background: linear-gradient(135deg, #d4b8a8, #e2dbd4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ---- 夜间 · 静夜 ---- */
+body.night-mode {
+    --sidebar-bg: #161312;
+    --sidebar-text: #c8c0b4;
+    --sidebar-header-bg: #0f0d0c;
+    --sidebar-hover: rgba(255,255,255,0.03);
+    --sidebar-active: rgba(180,130,115,0.18);
+    --sub-bg: rgba(0,0,0,0.18);
+    --content-bg: #1b1817;
+    --text: #e5ddd4;
+    --text-secondary: #9c9085;
+    --accent: #c49b8a;
+    --accent-light: #d4b5a5;
+    --blockquote-bg: #221f1c;
+    --blockquote-border: #c49b8a;
+    --code-bg: #221f1c;
+    --table-th-bg: #221f1c;
+    --gradient-start: #8b6a5a;
+    --gradient-end: #5c3d30;
+    --nav-bg: #201d1a;
+    --search-panel-bg: #1b1817;
+    --scrollbar-thumb: rgba(255,255,255,0.05);
+    --scrollbar-hover: rgba(255,255,255,0.10);
+    --border-color: #2a2522;
+    --glass-bg: rgba(27,24,23,0.72);
+    --glass-border: rgba(255,255,255,0.05);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.20);
+    --accent-gradient: linear-gradient(135deg, #c49b8a, #d4b5a5);
+}
+body.night-mode .sidebar-title-row h1 {
+    background: linear-gradient(135deg, #d4b5a5, #c8c0b4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ---- 护眼 · 旧纸 ---- */
+body.eye-care {
+    --sidebar-bg: #4a3f35;
+    --sidebar-text: #ede4d3;
+    --sidebar-header-bg: #3a3028;
+    --sidebar-hover: rgba(255,255,255,0.05);
+    --sidebar-active: rgba(180,140,100,0.28);
+    --sub-bg: rgba(0,0,0,0.10);
+    --content-bg: #f2eddf;
+    --text: #3d2e20;
+    --text-secondary: #8a7560;
+    --accent: #b8845a;
+    --accent-light: #c8956c;
+    --blockquote-bg: #e9e2cf;
+    --blockquote-border: #c8956c;
+    --code-bg: #e9e2cf;
+    --table-th-bg: #e9e2cf;
+    --gradient-start: #7a5a30;
+    --gradient-end: #5c3d20;
+    --nav-bg: #e9e2cf;
+    --search-panel-bg: #f2eddf;
+    --scrollbar-thumb: rgba(0,0,0,0.08);
+    --scrollbar-hover: rgba(0,0,0,0.15);
+    --border-color: #d8c8b0;
+    --glass-bg: rgba(242,237,223,0.72);
+    --glass-border: rgba(0,0,0,0.05);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.05);
+    --accent-gradient: linear-gradient(135deg, #b8845a, #c8956c);
+}
+body.eye-care .sidebar-title-row h1 {
+    background: linear-gradient(135deg, #e8c8a0, #ede4d3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ---- 轻奢 · 墨韵 ---- */
+body.luxury {
+    --sidebar-bg: #1a1612;
+    --sidebar-text: #d4c9a8;
+    --sidebar-header-bg: #120f0c;
+    --sidebar-hover: rgba(200,170,120,0.06);
+    --sidebar-active: rgba(200,170,120,0.20);
+    --sub-bg: rgba(0,0,0,0.18);
+    --content-bg: #faf8f4;
+    --text: #2c2416;
+    --text-secondary: #8b7a5c;
+    --accent: #a08040;
+    --accent-light: #c8a850;
+    --blockquote-bg: #f6f0e4;
+    --blockquote-border: #a08040;
+    --code-bg: #f4ede0;
+    --table-th-bg: #f4ede0;
+    --gradient-start: #8b6914;
+    --gradient-end: #5c4308;
+    --nav-bg: #f4ede0;
+    --search-panel-bg: #faf8f4;
+    --scrollbar-thumb: rgba(0,0,0,0.06);
+    --scrollbar-hover: rgba(0,0,0,0.12);
+    --border-color: #e0d5c0;
+    --glass-bg: rgba(250,248,244,0.72);
+    --glass-border: rgba(0,0,0,0.05);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.06);
+    --accent-gradient: linear-gradient(135deg, #a08040, #c8a850);
+}
+body.luxury .sidebar-title-row h1 {
+    background: linear-gradient(135deg, #d4b860, #d4c9a8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ---- 极简 · 素白 ---- */
+body.minimal {
+    --sidebar-bg: #f7f7f5;
+    --sidebar-text: #444;
+    --sidebar-header-bg: #eee;
+    --sidebar-hover: rgba(0,0,0,0.04);
+    --sidebar-active: rgba(0,0,0,0.06);
+    --sub-bg: rgba(0,0,0,0.02);
+    --content-bg: #fff;
+    --text: #111;
+    --text-secondary: #888;
+    --accent: #333;
+    --accent-light: #555;
+    --blockquote-bg: #f9f9f9;
+    --blockquote-border: #333;
+    --code-bg: #f5f5f5;
+    --table-th-bg: #f5f5f5;
+    --gradient-start: #333;
+    --gradient-end: #111;
+    --nav-bg: #fafafa;
+    --search-panel-bg: #fff;
+    --scrollbar-thumb: rgba(0,0,0,0.08);
+    --scrollbar-hover: rgba(0,0,0,0.16);
+    --border-color: #e5e5e5;
+    --sidebar-active: rgba(0,0,0,0.08);
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.03);
+    --shadow: 0 2px 12px rgba(0,0,0,0.04);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
+    --search-bg: rgba(0,0,0,0.3);
+    --glass-bg: rgba(255,255,255,0.72);
+    --glass-border: rgba(0,0,0,0.05);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.05);
+    --accent-gradient: linear-gradient(135deg, #333, #555);
+}
+body.minimal .sidebar-title-row h1 {
+    background: none;
+    -webkit-text-fill-color: #111;
+    color: #111;
+}
+
+/* ---- 现代 · 青蓝 ---- */
+body.modern {
+    --sidebar-bg: #1e2835;
+    --sidebar-text: #c8d0d8;
+    --sidebar-header-bg: #16202c;
+    --sidebar-hover: rgba(100,140,180,0.06);
+    --sidebar-active: rgba(100,140,180,0.18);
+    --sub-bg: rgba(0,0,0,0.14);
+    --content-bg: #f8fafc;
+    --text: #0f172a;
+    --text-secondary: #64748b;
+    --accent: #4a7a9b;
+    --accent-light: #6a9ab8;
+    --blockquote-bg: #f1f5f9;
+    --blockquote-border: #4a7a9b;
+    --code-bg: #f1f5f9;
+    --table-th-bg: #f1f5f9;
+    --gradient-start: #3a6080;
+    --gradient-end: #2a4a64;
+    --nav-bg: #f1f5f9;
+    --search-panel-bg: #f8fafc;
+    --scrollbar-thumb: rgba(0,0,0,0.07);
+    --scrollbar-hover: rgba(0,0,0,0.13);
+    --border-color: #e2e8f0;
+    --glass-bg: rgba(248,250,252,0.72);
+    --glass-border: rgba(0,0,0,0.05);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.06);
+    --accent-gradient: linear-gradient(135deg, #4a7a9b, #6a9ab8);
+}
+body.modern .sidebar-title-row h1 {
+    background: linear-gradient(135deg, #8ab8d0, #c8d0d8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ---- 休闲 · 苔青 ---- */
+body.relax {
+    --sidebar-bg: #2d362c;
+    --sidebar-text: #d8e8d0;
+    --sidebar-header-bg: #1f2b1e;
+    --sidebar-hover: rgba(130,180,120,0.06);
+    --sidebar-active: rgba(130,180,120,0.16);
+    --sub-bg: rgba(0,0,0,0.12);
+    --content-bg: #f5faf5;
+    --text: #1c2b1c;
+    --text-secondary: #6b8a6b;
+    --accent: #4a8c4a;
+    --accent-light: #6aaa6a;
+    --blockquote-bg: #eaf5ea;
+    --blockquote-border: #4a8c4a;
+    --code-bg: #ecf5ec;
+    --table-th-bg: #ecf5ec;
+    --gradient-start: #3d723d;
+    --gradient-end: #2d5a2d;
+    --nav-bg: #eaf5ea;
+    --search-panel-bg: #f5faf5;
+    --scrollbar-thumb: rgba(0,0,0,0.06);
+    --scrollbar-hover: rgba(0,0,0,0.12);
+    --border-color: #dce8dc;
+    --glass-bg: rgba(245,250,245,0.72);
+    --glass-border: rgba(0,0,0,0.05);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.05);
+    --accent-gradient: linear-gradient(135deg, #4a8c4a, #6aaa6a);
+}
+body.relax .sidebar-title-row h1 {
+    background: linear-gradient(135deg, #90c890, #d8e8d0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ---- 可爱 · 藤紫 ---- */
+body.cute {
+    --sidebar-bg: #3a2e38;
+    --sidebar-text: #ecd8e8;
+    --sidebar-header-bg: #2c202a;
+    --sidebar-hover: rgba(200,150,190,0.06);
+    --sidebar-active: rgba(200,150,190,0.18);
+    --sub-bg: rgba(0,0,0,0.12);
+    --content-bg: #fdf7fa;
+    --text: #2c1c2a;
+    --text-secondary: #8b6b86;
+    --accent: #b078a0;
+    --accent-light: #c898b5;
+    --blockquote-bg: #faeef5;
+    --blockquote-border: #b078a0;
+    --code-bg: #faf0f6;
+    --table-th-bg: #faf0f6;
+    --gradient-start: #905a80;
+    --gradient-end: #6a4060;
+    --nav-bg: #faeef5;
+    --search-panel-bg: #fdf7fa;
+    --scrollbar-thumb: rgba(0,0,0,0.06);
+    --scrollbar-hover: rgba(0,0,0,0.12);
+    --border-color: #ecdde8;
+    --glass-bg: rgba(253,247,250,0.72);
+    --glass-border: rgba(0,0,0,0.05);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.05);
+    --accent-gradient: linear-gradient(135deg, #b078a0, #c898b5);
+}
+body.cute .sidebar-title-row h1 {
+    background: linear-gradient(135deg, #d8a8c8, #ecd8e8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ---- 橙子 · 暖柿 ---- */
+body.orange {
+    --sidebar-bg: #3d3025;
+    --sidebar-text: #f0dcc8;
+    --sidebar-header-bg: #2d2015;
+    --sidebar-hover: rgba(230,150,90,0.06);
+    --sidebar-active: rgba(230,150,90,0.18);
+    --sub-bg: rgba(0,0,0,0.12);
+    --content-bg: #fef9f5;
+    --text: #2c2016;
+    --text-secondary: #8b705a;
+    --accent: #c8784a;
+    --accent-light: #d89868;
+    --blockquote-bg: #fef4e8;
+    --blockquote-border: #c8784a;
+    --code-bg: #fef5ea;
+    --table-th-bg: #fef5ea;
+    --gradient-start: #b06838;
+    --gradient-end: #8a4828;
+    --nav-bg: #fef4e8;
+    --search-panel-bg: #fef9f5;
+    --scrollbar-thumb: rgba(0,0,0,0.06);
+    --scrollbar-hover: rgba(0,0,0,0.12);
+    --border-color: #ece0d0;
+    --glass-bg: rgba(254,249,245,0.72);
+    --glass-border: rgba(0,0,0,0.05);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.05);
+    --accent-gradient: linear-gradient(135deg, #c8784a, #d89868);
+}
+body.orange .sidebar-title-row h1 {
+    background: linear-gradient(135deg, #e8b088, #f0dcc8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ==============================
+   Font size application
+   ============================== */
+body.size-0 { --content-font-size: var(--fs-0); }
+body.size-1 { --content-font-size: var(--fs-1); }
+body.size-2 { --content-font-size: var(--fs-2); }
+body.size-3 { --content-font-size: var(--fs-3); }
+body.size-4 { --content-font-size: var(--fs-4); }
+
+/* ==============================
+   Reading font application
+   ============================== */
+body.font-default   { --content-font-family: "Source Serif 4", "Noto Serif CJK SC", "Songti SC", "STSong", serif; }
+body.font-song      { --content-font-family: "SimSun", "Songti SC", "STSong", "Noto Serif CJK SC", serif; }
+body.font-fangsong  { --content-font-family: "FangSong", "STFangsong", "DFKai-SB", serif; }
+body.font-kai       { --content-font-family: "KaiTi", "STKaiti", "DFKai-SB", "AR PL UKai CN", serif; }
+body.font-hei       { --content-font-family: "SimHei", "Heiti SC", "STHeiti", sans-serif; }
+body.font-yahei     { --content-font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif; }
+body.font-source-serif  { --content-font-family: "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", serif; }
+body.font-source-sans   { --content-font-family: "Source Han Sans SC", "Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei", sans-serif; }

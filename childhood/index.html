@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>childHood · 阅读器</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%239b7b6d'/><path d='M16 8c3-2 8-1 10 0v15c-2-1-7-2-10 0M16 8c-3-2-8-1-10 0v15c2-1 7-2 10 0' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/reader.css">
+<link rel="stylesheet" href="css/overlays.css">
+<link rel="stylesheet" href="css/illustration-viewer.css">
+<link rel="stylesheet" href="css/welcome.css">
+<link rel="stylesheet" href="css/mobile.css">
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="css/static-preview.css">
+</head>
+<body>
+<div id="readerScreen"><div id="readerViewport">
+<a class="skip-link" href="#mainContent">跳转到正文</a>
+
+<!-- 阅读进度条 -->
+<div class="reading-progress" id="readingProgress"><div class="reading-progress-fill"></div></div>
+
+<!-- 移动端侧边栏遮罩 -->
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+<div class="footnote-backdrop" id="footnoteBackdrop" onclick="toggleFootnotePanel()"></div>
+
+<!-- 可折叠侧边栏 -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-title-row">
+            <h1>childHood</h1>
+            <div class="sidebar-header-actions">
+                <button id="btnLogin" class="icon-btn" onclick="openLogin()" title="登录" aria-label="登录">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </button>
+                <div id="userBadge" class="user-badge" style="display:none">
+                    <button class="user-avatar-btn" id="userAvatarBtn" onclick="event.stopPropagation(); toggleUserMenu();" title="用户菜单" aria-label="用户菜单" aria-haspopup="true" aria-expanded="false">
+                        <span class="user-avatar-dot" id="userAvatarDot"></span>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="user-dropdown-header" id="userDropdownName"></div>
+                        <div class="user-dropdown-achs-label">成就</div>
+                        <div class="user-dropdown-achs" id="userDropdownAchs"></div>
+                        <div id="dropdownDefault">
+                            <button class="user-dropdown-item" onclick="showLogoutConfirm(event)">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                <span>退出登录</span>
+                            </button>
+                        </div>
+                        <div id="dropdownConfirm" style="display:none">
+                            <div class="user-dropdown-desc">确定要退出登录吗？</div>
+                            <div class="user-dropdown-actions">
+                                <button class="user-dropdown-item" onclick="cancelLogout(event)" style="color:var(--text-secondary)">取消</button>
+                                <button class="user-dropdown-item" onclick="logout(); document.getElementById('userDropdown').classList.remove('open');" style="color:#e74c3c">确认退出</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="icon-btn" onclick="toggleSidebar()" title="收起侧边栏" aria-label="收起侧边栏">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <button class="icon-btn" onclick="openSettings()" title="设置" aria-label="设置">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </button>
+            </div>
+        </div>
+        <div id="stats">加载中...</div>
+        <div class="search-box">
+            <button type="button" id="quickSearch" class="search-trigger" onclick="openSearch()" aria-label="搜索章节" aria-haspopup="dialog" aria-controls="searchOverlay">搜索章节…</button>
+            <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </div>
+    </div>
+
+    <nav class="chapter-list" id="chapterList" aria-label="章节目录">
+        <div class="loading">加载目录中</div>
+    </nav>
+</aside>
+
+<!-- 侧边栏展开按钮（收起时显示） -->
+<button class="sidebar-expand-btn btn-hidden" id="btnExpandSidebar" onclick="toggleSidebar()" title="展开侧边栏" aria-label="展开侧边栏">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="4" y1="6" x2="20" y2="6"/>
+        <line x1="4" y1="12" x2="20" y2="12"/>
+        <line x1="4" y1="18" x2="20" y2="18"/>
+    </svg>
+</button>
+
+<!-- 内容区域（含脚注侧栏） -->
+<div class="content-area">
+    <main class="main-content" id="mainContent" tabindex="-1">
+        <div class="content-wrapper">
+            <div class="welcome">
+                <div class="welcome-card">
+                    <h2 class="welcome-title">childHood</h2>
+                    <p class="welcome-subtitle">一部关于童年的记忆之书 · 临时阅读版</p>
+                    <div class="welcome-stats" id="welcomeStats">
+                        <div class="welcome-stat">
+                            <span class="welcome-stat-num" id="welcomeSeries">-</span>
+                            <span class="welcome-stat-label">系列</span>
+                        </div>
+                        <div class="welcome-stat">
+                            <span class="welcome-stat-num" id="welcomeChapters">-</span>
+                            <span class="welcome-stat-label">章节</span>
+                        </div>
+                        <div class="welcome-stat">
+                            <span class="welcome-stat-num" id="welcomeWords">-</span>
+                            <span class="welcome-stat-label">千字</span>
+                        </div>
+                    </div>
+                    <div class="welcome-login-card" id="welcomeLoginCard" style="display:none">
+                        <div class="welcome-login-avatar">
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <h3 class="welcome-login-title">欢迎阅读</h3>
+                        <p class="welcome-login-desc">登录后保存阅读进度，解锁成就</p>
+                        <button class="welcome-login-btn" onclick="openLogin()">起个名字吧</button>
+                    </div>
+                    <div class="welcome-menu" id="welcomeActionsGrid" style="display:none">
+                        <!-- 主操作：下一章 -->
+                        <button onclick="startReading()" class="welcome-menu-item welcome-menu-item--hero">
+                            <span class="welcome-menu-icon welcome-menu-icon--hero">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                            </span>
+                            <span class="welcome-menu-text">
+                                <span class="welcome-menu-label">下一章</span>
+                                <span class="welcome-menu-sub">继续上次阅读</span>
+                            </span>
+                            <span class="welcome-menu-arrow">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            </span>
+                        </button>
+                        <!-- 双列：目录 + 搜索 -->
+                        <div class="welcome-menu-row">
+                            <button onclick="openChapterDirectory()" class="welcome-menu-item welcome-menu-item--toc">
+                                <span class="welcome-menu-icon welcome-menu-icon--toc">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+                                </span>
+                                <span class="welcome-menu-text">
+                                    <span class="welcome-menu-label">目录</span>
+                                    <span class="welcome-menu-sub">浏览已开放章节</span>
+                                </span>
+                            </button>
+                            <button onclick="openSearch()" class="welcome-menu-item welcome-menu-item--search">
+                                <span class="welcome-menu-icon welcome-menu-icon--search">
+                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                                </span>
+                                <span class="welcome-menu-text">
+                                    <span class="welcome-menu-label">搜索</span>
+                                    <span class="welcome-menu-sub">查找内容</span>
+                                </span>
+                            </button>
+                        </div>
+                        <!-- 设置 -->
+                        <button onclick="openSettings()" class="welcome-menu-item welcome-menu-item--settings">
+                            <span class="welcome-menu-icon welcome-menu-icon--settings">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                            </span>
+                            <span class="welcome-menu-text">
+                                <span class="welcome-menu-label">设置</span>
+                                <span class="welcome-menu-sub">主题 / 字体 / 字号</span>
+                            </span>
+                            <span class="welcome-menu-arrow">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 脚注侧边栏 -->
+    <aside class="footnote-panel" id="footnotePanel" aria-label="章节注释" style="display:none">
+        <div class="footnote-panel-header">
+            <span class="footnote-panel-title">注释</span>
+        </div>
+        <div class="footnote-panel-content" id="footnotePanelContent"></div>
+    </aside>
+    <!-- 脚注折叠箭头 -->
+    <button type="button" class="footnote-toggle" id="footnoteToggle" onclick="toggleFootnotePanel()" title="显示/隐藏注释" aria-label="显示/隐藏注释" aria-controls="footnotePanel" aria-expanded="false" style="display:none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+
+    <!-- 反馈按钮已移至章节标题旁，由 JS 动态生成 -->
+</div>
+
+<!-- 回到顶部 -->
+<button class="back-to-top" id="backToTop" onclick="scrollToTop()" title="回到顶部" aria-label="回到顶部">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+</button>
+
+<!-- 搜索覆盖层 -->
+<div class="search-overlay" id="searchOverlay">
+    <div class="search-panel" role="dialog" aria-modal="true" aria-label="搜索章节">
+        <div class="search-panel-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="searchInput" aria-label="搜索关键词" placeholder="输入关键词搜索全书...">
+            <button class="search-panel-close" onclick="closeSearch()" aria-label="关闭搜索">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <div class="search-stats" id="searchStats" style="display:none"></div>
+        <div class="search-results" id="searchResults"></div>
+    </div>
+</div>
+
+<!-- 设置覆盖层 -->
+<div class="settings-overlay" id="settingsOverlay">
+    <div class="settings-panel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+        <div class="settings-header">
+            <div><h2 id="settingsTitle">阅读设置</h2><p class="settings-subtitle">随心调整，即时保存</p></div>
+            <button class="search-panel-close" onclick="closeSettings()" aria-label="关闭设置">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <div class="settings-body">
+            <div class="settings-section">
+                <div class="settings-label" id="labelDirection">屏幕方向</div>
+                <div class="settings-options">
+                    <button type="button" id="toggleOrientation" aria-describedby="orientationStatus" class="setting-option" onclick="Reader.viewport.toggle()">切换为横屏</button>
+                </div>
+                <p class="settings-help" id="orientationStatus" aria-live="polite">切换整个阅读界面的横屏／竖屏。</p>
+            </div>
+            <!-- 视觉风格 -->
+            <div class="settings-section">
+                <div class="settings-label" id="labelTheme">视觉风格</div>
+                <div class="settings-options" id="settingTheme" role="group" aria-labelledby="labelTheme">
+                    <button data-value="day" class="setting-option theme-btn active"><span class="theme-dot" style="--dot: #9b7b6d; --dot-bg: #faf6f2"></span>日间</button>
+                    <button data-value="night" class="setting-option theme-btn"><span class="theme-dot" style="--dot: #c49b8a; --dot-bg: #1b1817"></span>夜间</button>
+                    <button data-value="eye" class="setting-option theme-btn"><span class="theme-dot" style="--dot: #b8845a; --dot-bg: #f2eddf"></span>护眼</button>
+                    <button data-value="luxury" class="setting-option theme-btn"><span class="theme-dot" style="--dot: #a08040; --dot-bg: #faf8f4"></span>轻奢</button>
+                    <button data-value="minimal" class="setting-option theme-btn"><span class="theme-dot" style="--dot: #444; --dot-bg: #fff"></span>极简</button>
+                    <button data-value="modern" class="setting-option theme-btn"><span class="theme-dot" style="--dot: #4a7a9b; --dot-bg: #f8fafc"></span>现代</button>
+                    <button data-value="relax" class="setting-option theme-btn"><span class="theme-dot" style="--dot: #4a8c4a; --dot-bg: #f5faf5"></span>休闲</button>
+                    <button data-value="cute" class="setting-option theme-btn"><span class="theme-dot" style="--dot: #b078a0; --dot-bg: #fdf7fa"></span>可爱</button>
+                    <button data-value="orange" class="setting-option theme-btn"><span class="theme-dot" style="--dot: #c8784a; --dot-bg: #fef9f5"></span>橙子</button>
+                </div>
+            </div>
+            <!-- 字体 -->
+            <div class="settings-section">
+                <div class="settings-label" id="labelFont">阅读字体</div>
+                <div class="settings-options" id="settingFont" role="group" aria-labelledby="labelFont">
+                    <button data-value="default" class="setting-option font-btn" style="font-family: 'Source Serif 4', 'Noto Serif CJK SC', serif">系统默认</button>
+                    <button data-value="song" class="setting-option font-btn active" style="font-family: 'SimSun', 'Songti SC', serif">宋体</button>
+                    <button data-value="fangsong" class="setting-option font-btn" style="font-family: 'FangSong', 'STFangsong', serif">仿宋</button>
+                    <button data-value="kai" class="setting-option font-btn" style="font-family: 'KaiTi', 'STKaiti', serif">楷体</button>
+                    <button data-value="hei" class="setting-option font-btn" style="font-family: 'SimHei', 'Heiti SC', sans-serif">黑体</button>
+                    <button data-value="yahei" class="setting-option font-btn" style="font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif">微软雅黑</button>
+                    <button data-value="source-serif" class="setting-option font-btn" style="font-family: 'Source Han Serif SC', 'Noto Serif CJK SC', serif">思源宋体</button>
+                    <button data-value="source-sans" class="setting-option font-btn" style="font-family: 'Source Han Sans SC', 'Noto Sans CJK SC', sans-serif">思源黑体</button>
+                </div>
+            </div>
+            <!-- 字号 -->
+            <div class="settings-section">
+                <div class="settings-label" id="labelSize">字号大小</div>
+                <div class="settings-options" id="settingSize" role="group" aria-labelledby="labelSize">
+                    <button data-value="0" class="setting-option size-btn" aria-label="小号">A</button>
+                    <button data-value="1" class="setting-option size-btn" aria-label="较小">A</button>
+                    <button data-value="2" class="setting-option size-btn active" aria-label="默认字号">A</button>
+                    <button data-value="3" class="setting-option size-btn" aria-label="较大">A</button>
+                    <button data-value="4" class="setting-option size-btn" aria-label="大号">A</button>
+                </div>
+            </div>
+            <!-- 小节目录 -->
+            <div class="settings-section">
+                <button type="button" class="settings-toggle" id="settingMiniToc" role="switch" aria-checked="false" aria-labelledby="miniTocLabel" aria-describedby="miniTocDescription" onclick="toggleMiniTocSetting()">
+                    <span class="toggle-text">
+                        <span class="toggle-label" id="miniTocLabel">小节目录</span>
+                        <span class="toggle-desc" id="miniTocDescription">在阅读时显示当前章节的小节目录</span>
+                    </span>
+                    <span class="toggle-switch" id="toggleMiniTocSwitch" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 浮动小节目录 -->
+<div class="floating-toc toc-surface" id="floatingToc" style="display:none">
+    <div class="floating-toc-title">本节目录</div>
+    <div class="floating-toc-list" id="floatingTocList"></div>
+</div>
+
+<!-- 反馈覆盖层 -->
+<div class="feedback-overlay" id="feedbackOverlay">
+    <div class="feedback-panel">
+        <div class="feedback-header">
+            <h3>提交意见</h3>
+            <span class="feedback-chapter" id="feedbackChapter"></span>
+            <button class="search-panel-close" onclick="closeFeedback()" aria-label="关闭">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <div class="feedback-body">
+            <div class="feedback-field">
+                <label class="feedback-label">类型</label>
+                <div class="feedback-types" id="feedbackTypes">
+                    <button class="feedback-type-btn active" data-value="提议">提议</button>
+                    <button class="feedback-type-btn" data-value="意见">意见</button>
+                    <button class="feedback-type-btn" data-value="勘误">勘误</button>
+                    <button class="feedback-type-btn" data-value="投诉">投诉</button>
+                    <button class="feedback-type-btn" data-value="评论">评论</button>
+                    <button class="feedback-type-btn" data-value="补充">补充</button>
+                    <button class="feedback-type-btn" data-value="感悟">感悟</button>
+                    <button class="feedback-type-btn" data-value="提问">提问</button>
+                </div>
+            </div>
+            <div class="feedback-field">
+                <label class="feedback-label" for="feedbackContent">内容</label>
+                <textarea id="feedbackContent" class="feedback-textarea" placeholder="请在此输入您的意见…" rows="6"></textarea>
+            </div>
+            <div class="feedback-actions">
+                <span class="feedback-msg" id="feedbackMsg"></span>
+                <button class="feedback-cancel" onclick="closeFeedback()">取消</button>
+                <button class="feedback-submit" onclick="submitFeedback()">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 登录覆盖层 -->
+<div class="login-overlay" id="loginOverlay">
+    <div class="login-panel">
+        <div class="login-header">
+            <h3>起个名字吧</h3>
+            <button class="search-panel-close" onclick="closeLogin()" aria-label="关闭">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        <div class="login-body">
+            <div class="login-field">
+                <label class="login-label" for="loginUsername">用户名</label>
+                <input type="text" id="loginUsername" class="login-input" placeholder="输入用户名即可开始" autocomplete="off">
+            </div>
+            <div class="login-actions">
+                <span class="login-msg" id="loginMsg"></span>
+                <button class="login-cancel" onclick="closeLogin()">取消</button>
+                <button class="login-submit" id="loginSubmit" onclick="doAuth()">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div></div>
+<script src="js/platform.js"></script>
+<script src="js/state.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/orientation.js"></script>
+<script src="js/sidebar.js"></script>
+<script src="js/illustration-viewer.js"></script>
+<script src="js/reader.js"></script>
+<script src="js/search.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/feedback.js"></script>
+<script src="js/achievements.js"></script>
+<script src="js/mobile.js"></script>
+<script src="js/static-preview.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
