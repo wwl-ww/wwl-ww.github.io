@@ -1,4 +1,0 @@
-#btnLogin, #userBadge, #welcomeLoginCard, #loginOverlay, #feedbackOverlay,
-[onclick*="openFeedback"], [onclick*="openLogin"], .feedback-inline-btn {
-    display: none !important;
-}
