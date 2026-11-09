@@ -1,0 +1,6 @@
+#btnLogin, #userBadge, #welcomeLoginCard, #loginOverlay, [onclick*="openLogin"],
+html:not(.static-feedback-enabled) #feedbackOverlay,
+html:not(.static-feedback-enabled) [onclick*="openFeedback"],
+html:not(.static-feedback-enabled) .feedback-inline-btn {
+    display: none !important;
+}
