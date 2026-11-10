@@ -1,0 +1,58 @@
+.illustration-viewer {
+    position: fixed; inset: 0; margin: 0; width: 100%; height: 100%; height: 100dvh;
+    max-width: none; max-height: none; padding: 0; border: 0;
+    background: var(--content-bg); color: var(--text); overscroll-behavior: contain;
+}
+.illustration-viewer[open] { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; }
+.illustration-viewer-host { position: absolute; inset: 0; overflow: hidden; background: var(--content-bg); }
+.illustration-viewer-surface {
+    position: absolute; inset: 0; overflow: hidden; background: var(--content-bg); color: var(--text);
+    display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto;
+}
+.illustration-viewer-surface.is-rotated {
+    inset: auto; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(90deg);
+}
+.illustration-viewer::backdrop { background: var(--content-bg); }
+.illustration-viewer-toolbar {
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+    padding: calc(12px + env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 12px max(20px, env(safe-area-inset-left));
+    border-bottom: 1px solid var(--border-color);
+}
+.illustration-viewer-title { min-width: 0; font-family: var(--font-serif); font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.illustration-viewer-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.illustration-viewer button, .illustration-viewer .illustration-download {
+    min-width: 44px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--border-color);
+    border-radius: 8px; background: var(--content-bg); color: var(--text); cursor: pointer; font: inherit;
+    box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; text-decoration: none;
+}
+.illustration-viewer button:hover, .illustration-viewer button:active,
+.illustration-viewer .illustration-download:hover, .illustration-viewer .illustration-download:active { background: var(--blockquote-bg); }
+.illustration-viewer button:disabled { opacity: .4; cursor: default; }
+.illustration-viewer button:focus-visible, .illustration-viewer .illustration-download:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.illustration-viewer button[aria-label="关闭大图"] { font-size: 24px; line-height: 1; margin-left: 12px; }
+.illustration-viewer-scale { min-width: 4ch; text-align: center; font-size: 12px; font-variant-numeric: tabular-nums; }
+.illustration-viewer-stage { position: relative; min-height: 0; overflow: hidden; touch-action: none; user-select: none; }
+.illustration-viewer-stage img { position: absolute; left: 50%; top: 50%; max-width: none; max-height: none; transform-origin: center; cursor: zoom-in; -webkit-touch-callout: default; -webkit-user-select: auto; user-select: auto; -webkit-user-drag: none; }
+.illustration-viewer-stage.is-zoomed { cursor: grab; }
+.illustration-viewer-stage.is-zoomed img { cursor: grab; }
+.illustration-viewer-stage.is-zoomed:active, .illustration-viewer-stage.is-zoomed:active img { cursor: grabbing; }
+.illustration-viewer-hint { margin: 0; padding: 8px 16px calc(12px + env(safe-area-inset-bottom)); font-size: 12px; line-height: 1.6; text-align: center; color: var(--text-secondary); }
+.illustration-viewer-surface.is-narrow .illustration-viewer-toolbar { flex-wrap: wrap; gap: 8px; padding-inline: 12px; }
+.illustration-viewer-surface.is-narrow .illustration-viewer-title { flex-basis: 100%; font-size: 13px; }
+.illustration-viewer-surface.is-narrow .illustration-viewer-controls { width: 100%; justify-content: space-between; gap: 8px; }
+.illustration-viewer-surface.is-narrow button, .illustration-viewer-surface.is-narrow .illustration-download { font-size: 14px; padding: 8px; }
+.illustration-viewer-surface.is-narrow button[aria-label="关闭大图"] { margin-left: 0; }
+.illustration-viewer-surface.is-narrow .illustration-viewer-hint { font-size: 11px; }
+
+.illustration-viewer-surface.is-compact .illustration-viewer-toolbar {
+        flex-wrap: nowrap; gap: 12px;
+        padding-block: max(4px, env(safe-area-inset-top)) 4px;
+        padding-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right));
+}
+.illustration-viewer-surface.is-compact .illustration-viewer-title { flex-basis: auto; }
+.illustration-viewer-surface.is-compact .illustration-viewer-controls { width: auto; }
+.illustration-viewer-surface.is-compact .illustration-viewer-hint { display: none; }
+.illustration-viewer-surface.is-compact .illustration-viewer-stage {
+        margin-left: env(safe-area-inset-left); margin-right: env(safe-area-inset-right);
+        margin-bottom: env(safe-area-inset-bottom);
+}

@@ -1,0 +1,214 @@
+/* childHood 阅读器 v6 — 基础重置 + 布局 + 滚动条 + 加载 */
+
+/* ==============================
+   Reset
+   ============================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--font-sans);
+    background: var(--content-bg);
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    transition: background 0.5s ease, color 0.5s ease;
+}
+
+#readerScreen { position: fixed; inset: 0; overflow: hidden; background: var(--content-bg); }
+#readerViewport {
+    position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: flex;
+    overflow: hidden; background: var(--content-bg); container: reader / size;
+    /* Fixed overlays belong to the reader surface, even without rotation. */
+    transform: translate(0, 0);
+}
+#readerViewport.is-rotated { left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(90deg); }
+
+/* Touch device optimizations */
+a, button, [role="button"], [tabindex], input, textarea, select {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+/* ==============================
+   Accessibility: skip link + focus ring
+   ============================== */
+.skip-link {
+    position: absolute; top: -100px; left: 8px;
+    background: var(--accent); color: #fff;
+    padding: 8px 16px; border-radius: var(--radius-sm);
+    z-index: 9999; font-size: 13px; text-decoration: none;
+    transition: top 0.2s ease;
+}
+.skip-link:focus { top: 8px; }
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* ==============================
+   Content area
+   ============================== */
+.content-area {
+    flex: 1; min-width: 0; display: flex; overflow: hidden;
+    position: relative;
+    contain: layout style;
+}
+
+.main-content {
+    flex: 1; min-width: 0; overflow-y: auto;
+    background: var(--content-bg);
+    transition: background 0.5s ease;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    contain: layout style;
+}
+
+.content-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 56px calc(72px + env(safe-area-inset-bottom));
+    min-height: 100cqh;
+}
+
+/* ==============================
+   Scrollbar
+   ============================== */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-hover); }
+.main-content::-webkit-scrollbar-track { background: transparent; }
+.main-content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.07); border-radius: 3px; }
+.main-content::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.14); }
+body.night-mode .main-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); }
+body.night-mode .main-content::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.10); }
+body.eye-care .main-content::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.07); }
+body.eye-care .main-content::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.14); }
+
+/* ==============================
+   Loading animation
+   ============================== */
+.loading {
+    text-align: center; padding: 56px;
+    color: var(--text-secondary); font-size: 14px; opacity: 0.6;
+}
+.loading::after {
+    content: ''; display: inline-block;
+    width: 18px; height: 18px;
+    border: 2px solid var(--border-color);
+    border-top-color: var(--accent);
+    border-radius: 50%; animation: spin 0.7s linear infinite;
+    margin-left: 10px; vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ==============================
+   Reading progress bar
+   ============================== */
+.reading-progress {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: var(--progress-height);
+    background: transparent;
+    z-index: 9998;
+    pointer-events: none;
+}
+.reading-progress-fill {
+    height: 100%; width: 0%;
+    background: var(--accent-gradient, var(--accent));
+    border-radius: 0 2px 2px 0;
+    box-shadow: 0 1px 4px color-mix(in srgb, var(--accent) 30%, transparent);
+    will-change: width;
+}
+
+/* ==============================
+   Back to top button
+   ============================== */
+.back-to-top {
+    position: fixed;
+    bottom: calc(28px + env(safe-area-inset-bottom));
+    right: calc(24px + env(safe-area-inset-right));
+    z-index: 500;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transform: translateY(16px);
+    pointer-events: none; visibility: hidden;
+    transition: opacity 0.35s var(--smooth-ease),
+                transform 0.35s var(--smooth-ease),
+                box-shadow 0.3s ease,
+                color 0.2s ease;
+    box-shadow: var(--glass-shadow);
+}
+.back-to-top.visible {
+    opacity: 0.8; transform: translateY(0);
+    pointer-events: auto; visibility: visible;
+}
+.back-to-top:hover {
+    opacity: 1;
+    color: var(--accent);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+    transform: translateY(-2px);
+}
+.back-to-top:active {
+    transform: scale(0.9);
+    transition: transform 0.1s ease;
+}
+@container reader (max-width: 768px) or ((max-width: 1024px) and (max-height: 500px)) {
+    .back-to-top {
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        right: calc(12px + env(safe-area-inset-right));
+        width: 44px; height: 44px;
+    }
+}
+@container reader (max-width: 1024px) {
+    /* Keep both controls reachable on chapters with notes. */
+    .content-area:has(.footnote-toggle.show) ~ .back-to-top {
+        bottom: calc(76px + env(safe-area-inset-bottom));
+    }
+}
+
+/* ==============================
+   Shared spring-hover utility
+   ============================== */
+.spring-hover {
+    transition: transform 0.35s var(--spring-ease),
+                box-shadow 0.35s ease;
+}
+.spring-hover:hover {
+    transform: translateY(-2px);
+}
+.spring-hover:active {
+    transform: scale(0.94);
+    transition-duration: 0.1s;
+}
+
+/* ==============================
+   Content fade-in
+   ============================== */
+@keyframes contentReveal {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.content-reveal {
+    animation: contentReveal 0.5s var(--smooth-ease) both;
+}
+
+/* ==============================
+   Reduced motion
+   ============================== */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .reading-progress-fill { transition: none; }
+    .back-to-top { transition: opacity 0.01ms; }
+}
